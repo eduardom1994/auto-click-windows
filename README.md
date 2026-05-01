@@ -18,6 +18,12 @@ Hotkeys
 
 Opções
 - `Seguir mouse`: quando ativado, o programa usa a posição atual do mouse a cada clique, permitindo que você mova o ponteiro enquanto o auto-clicker está ativo.
+- `Adicionar local atual`: permite configurar vários pontos de clique diferentes, cada um com seu próprio intervalo.
+
+Novidade nesta branch `20260501`
+- Agora você pode adicionar vários locais de clique.
+- Cada local pode usar um intervalo específico ou herdar o intervalo padrão.
+- O loop percorre os locais em sequência, clicando em cada um.
 
 Compilação para Executável
 Para criar um executável standalone no Windows:
