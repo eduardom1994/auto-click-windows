@@ -25,8 +25,8 @@ Novidade nesta branch `20260501`
 - Cada local pode usar um intervalo específico ou herdar o intervalo padrão.
 - O loop percorre os locais em sequência, clicando em cada um.
 - Botão "Limpar lista" para remover todos os locais de uma vez.
-- Correções: Foco automático ao pausar, prevenção de duplicatas e debounce para evitar adições múltiplas.
-- Testes unitários criados para validar a lógica.
+- Correções: Foco automático ao pausar, debounce para evitar adições múltiplas, remoção da verificação de duplicatas para evitar mensagens falsas.
+- Testes unitários (`test_main.py`) e script de teste de interface (`test_interface.py`) criados.
 
 Compilação para Executável
 Para criar um executável standalone no Windows:
