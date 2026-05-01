@@ -26,9 +26,8 @@ class TestAutoClicker(unittest.TestCase):
         self.app.local_interval_var.set("1.0")
         self.app.add_location()  # First time
         self.assertEqual(len(self.app.locations), 1)
-        with patch('tkinter.messagebox.showinfo') as mock_msg:
-            self.app.add_location()  # Duplicate
-            mock_msg.assert_called_once_with("Aviso", "Posição (100, 200) já adicionada.")
+        # With lock, duplicate calls are ignored without message
+        self.app.add_location()  # Duplicate - should be ignored
         self.assertEqual(len(self.app.locations), 1)  # Should not add again
 
     @patch('pyautogui.position')
