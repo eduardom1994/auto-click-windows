@@ -24,6 +24,9 @@ Novidade nesta branch `20260501`
 - Agora você pode adicionar vários locais de clique.
 - Cada local pode usar um intervalo específico ou herdar o intervalo padrão.
 - O loop percorre os locais em sequência, clicando em cada um.
+- Botão "Limpar lista" para remover todos os locais de uma vez.
+- Correções: Foco automático ao pausar, prevenção de duplicatas e debounce para evitar adições múltiplas.
+- Testes unitários criados para validar a lógica.
 
 Compilação para Executável
 Para criar um executável standalone no Windows:
