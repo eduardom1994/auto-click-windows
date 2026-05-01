@@ -29,9 +29,8 @@ class AutoClicker:
         self.locations_listbox = tk.Listbox(master, height=6, width=40)
         self.locations_listbox.grid(row=3, column=0, columnspan=2, padx=6)
 
-        tk.Button(master, text="Remover local selecionado", command=self.remove_location).grid(
-            row=4, column=0, columnspan=2, sticky="we", padx=6, pady=(6, 2)
-        )
+        tk.Button(master, text="Remover", command=self.remove_location).grid(row=4, column=0, padx=6, pady=(6, 2))
+        tk.Button(master, text="Limpar lista", command=self.clear_locations).grid(row=4, column=1, padx=6, pady=(6, 2))
 
         self.locations_label = tk.Label(master, text="Locais: 0")
         self.locations_label.grid(row=5, column=0, columnspan=2, padx=6, pady=(0, 6))
@@ -108,6 +107,10 @@ class AutoClicker:
             return
         index = selection[0]
         del self.locations[index]
+        self.update_locations_listbox()
+
+    def clear_locations(self):
+        self.locations = []
         self.update_locations_listbox()
 
     def _on_hotkey_add_location(self):
