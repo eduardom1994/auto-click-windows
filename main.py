@@ -93,6 +93,12 @@ class AutoClicker:
                 messagebox.showerror("Erro", "Intervalo local inválido. Use número > 0 ou deixe vazio para usar o padrão.")
                 return
 
+        # Verificar se a posição já existe
+        for existing_x, existing_y, _ in self.locations:
+            if existing_x == x and existing_y == y:
+                messagebox.showinfo("Aviso", f"Posição ({x}, {y}) já adicionada.")
+                return
+
         self.locations.append((x, y, interval))
         self.update_locations_listbox()
 
@@ -123,6 +129,7 @@ class AutoClicker:
             self._paused.set()
             try:
                 self.master.after(0, lambda: self.status_label.config(text="Pausado", fg="orange"))
+                self.master.after(0, lambda: self.master.focus_force())  # Focar a janela ao pausar
             except Exception:
                 pass
 
