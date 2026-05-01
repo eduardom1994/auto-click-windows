@@ -51,6 +51,7 @@ class AutoClicker:
         self._hotkeys_started = False
         self.locations = []
         self.adding = False
+        self.lock = threading.Lock()
 
         tk.Label(master, text="Hotkeys: F8 = Pausar/Retomar  |  F9 = Adicionar local atual").grid(
             row=8, column=0, columnspan=2, padx=6, pady=(4, 8)
@@ -80,27 +81,27 @@ class AutoClicker:
         self.locations_label.config(text=f"Locais: {len(self.locations)}")
 
     def add_location(self):
-        if self.adding:
+        if not self.lock.acquire(blocking=False):
             return
-        self.adding = True
 
-        x, y = pyautogui.position()
-        interval_text = self.local_interval_var.get().strip()
-        interval = None
+        try:
+            x, y = pyautogui.position()
+            interval_text = self.local_interval_var.get().strip()
+            interval = None
 
-        if interval_text:
-            try:
-                interval = float(interval_text)
-                if interval <= 0:
-                    raise ValueError()
-            except Exception:
-                messagebox.showerror("Erro", "Intervalo local inválido. Use número > 0 ou deixe vazio para usar o padrão.")
-                self.adding = False
-                return
+            if interval_text:
+                try:
+                    interval = float(interval_text)
+                    if interval <= 0:
+                        raise ValueError()
+                except Exception:
+                    messagebox.showerror("Erro", "Intervalo local inválido. Use número > 0 ou deixe vazio para usar o padrão.")
+                    return
 
-        self.locations.append((x, y, interval))
-        self.update_locations_listbox()
-        self.adding = False
+            self.locations.append((x, y, interval))
+            self.update_locations_listbox()
+        finally:
+            self.lock.release()
 
     def remove_location(self):
         selection = self.locations_listbox.curselection()
