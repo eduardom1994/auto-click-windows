@@ -98,13 +98,6 @@ class AutoClicker:
                 self.adding = False
                 return
 
-        # Verificar se a posição já existe
-        for existing_x, existing_y, _ in self.locations:
-            if existing_x == x and existing_y == y:
-                messagebox.showinfo("Aviso", f"Posição ({x}, {y}) já adicionada.")
-                self.adding = False
-                return
-
         self.locations.append((x, y, interval))
         self.update_locations_listbox()
         self.adding = False
