@@ -1,0 +1,16 @@
+{
+    "default_interval": "0.1",
+    "local_interval": "0.1",
+    "locations": [
+        [
+            1114,
+            451,
+            0.1
+        ],
+        [
+            1202,
+            336,
+            0.1
+        ]
+    ]
+}

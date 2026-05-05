@@ -1,4 +1,5 @@
-﻿import threading
+﻿import json
+import threading
 import time
 import tkinter as tk
 from tkinter import messagebox
@@ -14,12 +15,15 @@ class AutoClicker:
         self.master = master
         master.title("Click Auto - locais")
 
+        self.config_file = "config.json"
+        self.load_config()
+
         tk.Label(master, text="Intervalo padrão (s):").grid(row=0, column=0, padx=6, pady=6)
-        self.default_interval_var = tk.StringVar(value="1.0")
+        self.default_interval_var = tk.StringVar(value=self.config.get("default_interval", "0.1"))
         tk.Entry(master, textvariable=self.default_interval_var, width=10).grid(row=0, column=1, padx=6, pady=6)
 
         tk.Label(master, text="Intervalo local (s):").grid(row=1, column=0, padx=6, pady=6)
-        self.local_interval_var = tk.StringVar(value="1.0")
+        self.local_interval_var = tk.StringVar(value=self.config.get("local_interval", "0.1"))
         tk.Entry(master, textvariable=self.local_interval_var, width=10).grid(row=1, column=1, padx=6, pady=6)
 
         tk.Button(master, text="Adicionar local atual", command=self.add_location).grid(
@@ -27,13 +31,13 @@ class AutoClicker:
         )
 
         self.locations_listbox = tk.Listbox(master, height=6, width=40)
-        self.locations_listbox.grid(row=3, column=0, columnspan=2, padx=6)
+        self.locations_listbox.grid(row=3, column=0, columnspan=3, padx=6)
 
         tk.Button(master, text="Remover", command=self.remove_location).grid(row=4, column=0, padx=6, pady=(6, 2))
         tk.Button(master, text="Limpar lista", command=self.clear_locations).grid(row=4, column=1, padx=6, pady=(6, 2))
 
         self.locations_label = tk.Label(master, text="Locais: 0")
-        self.locations_label.grid(row=5, column=0, columnspan=2, padx=6, pady=(0, 6))
+        self.locations_label.grid(row=5, column=0, columnspan=3, padx=6, pady=(0, 6))
 
         self.start_btn = tk.Button(master, text="Iniciar", command=self.start)
         self.start_btn.grid(row=6, column=0, padx=6, pady=6)
@@ -42,19 +46,19 @@ class AutoClicker:
         self.stop_btn.grid(row=6, column=1, padx=6, pady=6)
 
         self.status_label = tk.Label(master, text="Parado", fg="red")
-        self.status_label.grid(row=7, column=0, columnspan=2, padx=6, pady=6)
+        self.status_label.grid(row=7, column=0, columnspan=3, padx=6, pady=6)
 
         self._thread = None
         self._running = threading.Event()
         self._paused = threading.Event()
         self._hotkeys = None
         self._hotkeys_started = False
-        self.locations = []
+        self.locations = self.config.get("locations", [])
         self.adding = False
         self.lock = threading.Lock()
 
         tk.Label(master, text="Hotkeys: F8 = Pausar/Retomar  |  F9 = Adicionar local atual").grid(
-            row=8, column=0, columnspan=2, padx=6, pady=(4, 8)
+            row=8, column=0, columnspan=3, padx=6, pady=(4, 8)
         )
 
         try:
@@ -66,9 +70,27 @@ class AutoClicker:
             self._hotkeys_started = True
         except Exception:
             tk.Label(master, text="(Hotkeys globais não disponíveis)", fg="orange").grid(row=9, column=0, columnspan=2)
+            master.bind('<F8>', lambda e: self._on_hotkey_pause())
+            master.bind('<F9>', lambda e: self._on_hotkey_add_location())
 
-        master.bind('<F8>', lambda e: self._on_hotkey_pause())
-        master.bind('<F9>', lambda e: self._on_hotkey_add_location())
+        self.update_locations_listbox()
+
+    def load_config(self):
+        try:
+            with open(self.config_file, 'r') as f:
+                self.config = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            self.config = {"default_interval": "0.1", "local_interval": "0.1", "locations": []}
+
+    def save_config(self):
+        self.config["default_interval"] = self.default_interval_var.get()
+        self.config["local_interval"] = self.local_interval_var.get()
+        self.config["locations"] = self.locations
+        try:
+            with open(self.config_file, 'w') as f:
+                json.dump(self.config, f, indent=4)
+        except Exception:
+            pass  # Silently fail if can't save
 
     def update_locations_listbox(self):
         self.locations_listbox.delete(0, tk.END)
@@ -85,6 +107,7 @@ class AutoClicker:
             return
 
         try:
+            print(f"{pyautogui.position()}")
             x, y = pyautogui.position()
             interval_text = self.local_interval_var.get().strip()
             interval = None
@@ -176,6 +199,7 @@ class AutoClicker:
         self.status_label.config(text="Parado", fg="red")
 
     def _on_close(self):
+        self.save_config()
         try:
             if self._hotkeys_started and self._hotkeys is not None:
                 self._hotkeys.stop()
